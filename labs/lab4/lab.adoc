@@ -91,8 +91,10 @@ image::papertrail_4.png[]
 . Click Edit Settings -> Click on the URL + Port assigned -> Enable Plain text 
 +
 image::papertrail_6.png[]
+
 +
 image::papertrail_7.png[]
+
 +
 image::papertrail_8.png[]
 
