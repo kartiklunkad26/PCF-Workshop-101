@@ -106,7 +106,7 @@ Bound Services:
 
 . You may also verify your service was provisioned in the Apps Manager UI by clicking on your application and selecting the _Services_ tab.
 +
-image::lab4.png[]
+image::lab6.png[]
 +
 You should now see the service created in step 1 listed.
 
