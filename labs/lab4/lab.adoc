@@ -134,7 +134,7 @@ Cloud Foundry's http://docs.cloudfoundry.org/concepts/architecture/#hm9k[Heatlh 
 . If you don't have one already running, start a log tail for `workshop`.  Alternatively, you could view the logs using the papertrail app.
 +
 ----
-$ cf logs workshop
+$ cf logs myfirstpcfdemo
 ----
 
 . If you do not have more than one application instance running, execute the scale command to scale to 2 or more application instances.  Visit the application in the browser, and click on the ``Kill Switch'' button. This button will trigger a JVM exit with an error code (`System.exit(1)`), causing the Health Manager to observe an application instance crash:
@@ -142,42 +142,26 @@ $ cf logs workshop
 image::lab.png[]
 
 . After clicking the kill switch a couple of interesting things should happen.
-First, you'll see an error code returned in the browser, as the request you submitted never returns a response:
-+
-image::lab1.png[]
-+
-Also, if you're paying attention to the log tail, you'll see some interesting log messages fly by:
+If you're paying attention to the log tail, you'll see some interesting log messages fly by:
 +
 ====
 ----
-2015-08-11T09:10:03.25-0400 [App/0]      OUT WARN : com.gopivotal.cf.workshop.web.CloudFoundryWorkshopController - *** The system is shutting down. ***  <1>
-2015-08-11T09:10:03.26-0400 [App/0]      OUT [CONTAINER] org.apache.coyote.http11.Http11NioProtocol         INFO    Pausing ProtocolHandler ["http-nio-61280"]
-2015-08-11T09:10:03.27-0400 [App/0]      OUT [CONTAINER] org.apache.catalina.core.StandardService           INFO    Stopping service Catalina
-2015-08-11T09:10:03.27-0400 [App/0]      OUT [CONTAINER] org.apache.catalina.core.StandardWrapper           INFO    Waiting for 1 instance(s) to be deallocated for Servlet [appServlet]
-2015-08-11T09:10:04.28-0400 [App/0]      OUT [CONTAINER] org.apache.catalina.core.StandardWrapper           INFO    Waiting for 1 instance(s) to be deallocated for Servlet [appServlet]
-2015-08-11T09:10:05.28-0400 [App/0]      OUT [CONTAINER] org.apache.catalina.core.StandardWrapper           INFO    Waiting for 1 instance(s) to be deallocated for Servlet [appServlet]
-...
-2015-08-11T09:10:05.83-0400 [RTR/0]      OUT adam-app.vert.fe.gopivotal.com - [11/08/2015:13:10:03 +0000] "GET /kill HTTP/1.1" 502 0 "https://adam-app.vert.fe.gopivotal.com/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_4) AppleWebKit/600.7.12 (KHTML, like Gecko) Version/8.0.7 Safari/600.7.12" 10.68.105.10:38348 x_forwarded_for:"10.68.248.58" vcap_request_id:37fc1845-1745-48bd-68e6-612dc6bcfb00 response_time:2.641058355 app_id:347c3d6b-e386-439f-8fc8-a561d39ea7bb  <2>
-2015-08-11T09:10:05.88-0400 [API/0]      OUT App instance exited with guid 347c3d6b-e386-439f-8fc8-a561d39ea7bb payload: {"cc_partition"=>"default", "droplet"=>"347c3d6b-e386-439f-8fc8-a561d39ea7bb", "version"=>"4f410012-28ec-452e-8ce7-0b460ebb61f9", "instance"=>"daf3174ddf5740069c1ed49f8733d77f", "index"=>0, "reason"=>"CRASHED", "exit_status"=>255, "exit_description"=>"app instance exited", "crash_timestamp"=>1439298605}  <3>
-----
-<1> Just before issuing the `System.exit(1)` call, the application logs that the kill switch was clicked.
-<2> The (Go)Router logs the 502 error.
-<3> The API logs that an application instance exited due to a crash.
+2016-03-22T01:11:19.93-0400 [RTR/0]      OUT myfirstpcfdemo.cfapps.io - [22/03/2016:05:11:19 +0000] "GET /getData?state=undefined HTTP/1.1" 502 0 67 "http://myfirstpcfdemo.cfapps.io/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_5) AppleWebKit/600.8.9 (KHTML, like Gecko) Version/8.0.8 Safari/600.8.9" 10.10.66.45:17667 x_forwarded_for:"98.109.42.52" x_forwarded_proto:"http" vcap_request_id:472ba37e-bc33-4987-4fb9-19a3aaee5909 response_time:0.493017518 app_id:4b211168-6e5c-4321-b71f-2cc59692da90
+2016-03-22T01:11:19.93-0400 [RTR/1]      OUT myfirstpcfdemo.cfapps.io - [22/03/2016:05:11:18 +0000] "GET /getHeatMap HTTP/1.1" 502 0 67 "http://myfirstpcfdemo.cfapps.io/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_5) AppleWebKit/600.8.9 (KHTML, like Gecko) Version/8.0.8 Safari/600.8.9" 10.10.66.45:5102 x_forwarded_for:"98.109.42.52" x_forwarded_proto:"http" vcap_request_id:8bd38d0b-0dd7-4fc6-4061-6a898869c9e0 response_time:1.673443505 app_id:4b211168-6e5c-4321-b71f-2cc59692da90
+2016-03-22T01:11:19.96-0400 [API/2]      OUT App instance exited with guid 4b211168-6e5c-4321-b71f-2cc59692da90 payload: {"instance"=>"66531e1b-2949-4336-7dbf-031dea5e2575", "index"=>1, "reason"=>"CRASHED", "exit_description"=>"2 error(s) occurred:\n\n* 2 error(s) occurred:\n\n* Exited with status 255\n* cancelled\n* cancelled", "crash_count"=>1, "crash_timestamp"=>1458623479925083151, "version"=>"b0069017-35fd-4bb0-9733-cc13603faba0"}
+
 ====
 
 . Wait a few seconds...  By this time you should have noticed some additional interesting events in the logs:
 +
 ====
 ----
-2015-08-11T09:12:34.48-0400 [DEA/1]      OUT Starting app instance (index 3) with guid 347c3d6b-e386-439f-8fc8-a561d39ea7bb  <1>
-2015-08-11T09:12:38.06-0400 [App/3]      OUT [CONTAINER] org.apache.coyote.http11.Http11NioProtocol         INFO    Initializing ProtocolHandler ["http-nio-61285"]
-2015-08-11T09:12:38.07-0400 [App/3]      OUT [CONTAINER] org.apache.catalina.startup.Catalina               INFO    Initialization processed in 557 ms
-2015-08-11T09:12:38.08-0400 [App/3]      OUT [CONTAINER] org.apache.catalina.core.StandardService           INFO    Starting service Catalina
-2015-08-11T09:12:38.08-0400 [App/3]      OUT [CONTAINER] org.apache.catalina.core.StandardEngine            INFO    Starting Servlet Engine: Apache Tomcat/8.0.21
-2015-08-11T09:12:38.11-0400 [App/3]      OUT [CONTAINER] org.apache.catalina.startup.HostConfig             INFO    Deploying web application directory /home/vcap/app/.java-buildpack/tomcat/webapps/ROOT  <2>
-----
-<1> The DEA indicates that it is starting another instance of the application as a result of the Health Manager observing a difference between the desired and actual state (i.e. running instances = 1 vs. running instances = 0).
-<2> The new application instance starts logging events as it starts up.
+2016-03-22T01:11:20.16-0400 [CELL/1]     OUT Creating container
+2016-03-22T01:11:20.67-0400 [CELL/1]     OUT Successfully created container
+2016-03-22T01:11:20.76-0400 [RTR/4]      OUT myfirstpcfdemo.cfapps.io - [22/03/2016:05:11:20 +0000] "GET /getHeatMap HTTP/1.1" 200 0 2663 "http://myfirstpcfdemo.cfapps.io/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_5) AppleWebKit/600.8.9 (KHTML, like Gecko) Version/8.0.8 Safari/600.8.9" 10.10.2.230:25208 x_forwarded_for:"98.109.42.52" x_forwarded_proto:"http" vcap_request_id:f6bc4272-c93a-43e0-46c0-3dc1fdd91b2c response_time:0.003706363 app_id:4b211168-6e5c-4321-b71f-2cc59692da90
+2016-03-22T01:11:20.77-0400 [RTR/1]      OUT myfirstpcfdemo.cfapps.io - [22/03/2016:05:11:20 +0000] "GET /getData?state=undefined HTTP/1.1" 200 0 3 "http://myfirstpcfdemo.cfapps.io/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_5) AppleWebKit/600.8.9 (KHTML, like Gecko) Version/8.0.8 Safari/600.8.9" 10.10.66.45:5102 x_forwarded_for:"98.109.42.52" x_forwarded_proto:"http" vcap_request_id:7d63d0d7-e6b6-4073-61d2-b5763c9a6712 response_time:0.002987647 app_id:4b211168-6e5c-4321-b71f-2cc59692da90
+2016-03-22T01:11:21.75-0400 [RTR/4]      OUT myfirstpcfdemo.cfapps.io - [22/03/2016:05:11:21 +0000] "GET /getData?state=undefined HTTP/1.1" 200 0 3 "http://myfirstpcfdemo.cfapps.io/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_5) AppleWebKit/600.8.9 (KHTML, like Gecko) Version/8.0.8 Safari/600.8.9" 10.10.2.230:25208 x_forwarded_for:"98.109.42.52" x_forwarded_proto:"http" vcap_request_id:a4801568-945d-40ff-69b6-527316be7707 response_time:0.002940021 app_id:4b211168-6e5c-4321-b71f-2cc59692da90
+
 ====
 
 . Revisiting the *HOME PAGE* of the application (don't simply refresh the browser as you're still on the `/killSwitch` endpoint and you'll just kill the application again!) and you should see a fresh instance started:
@@ -197,8 +181,8 @@ Take a look at the events that have transpired so far for our deployment of `wor
 
 ====
 ----
-$ cf events workshop
-Getting events for app workshop in org TELCO / space gammon as admin...
+$ cf events myfirstpcfdemo
+Getting events for app myfirstpcfdemo in org Northeast / Canada / space kartik as admin...
 
 time                          event                 actor      description
 2015-08-11T08:58:57.00-0400   app.crash             workshop   index: 0, reason: CRASHED, exit_description: app instance exited, exit_status: 255  <6>
@@ -222,16 +206,16 @@ Here we see the `app.create` event, which created our application's record and s
 . Let's explicitly ask for the application to be stopped:
 +
 ----
-$ cf stop workshop
-Stopping app workshop in org TELCO / space gammon as admin...
+$ cf stop myfirstpcfdemo
+Stopping app myfirstpcfdemo in org Northeast / Canada / space kartik as admin...
 OK
 ----
 
 . Now, examine the additional `app.update` event:
 +
 ----
-$ cf events workshop
-Getting events for app workshop in org TELCO / space gammon as admin...
+$ cf events myfirstpcfdemo
+Getting events for app myfirstpcfdemo in org Northeast / Canada / space kartik as admin...
 
 time                          event                 actor      description
 2015-08-11T09:01:35.00-0400   audit.app.update      admin      state: STOPPED
@@ -248,8 +232,8 @@ time                          event                 actor      description
 . Start the application again:
 +
 ----
-$ cf start workshop
-Starting app workshop in org TELCO / space gammon as admin...
+$ cf start myfirstpcfdemo
+Starting app myfirstpcfdemo in org Northeast / Canada / space kartik as admin...
 
 0 of 5 instances running, 5 starting
 2 of 5 instances running, 3 starting
@@ -261,7 +245,7 @@ OK
 
 App workshop was started using this command `JAVA_HOME=$PWD/.java-buildpack/open_jdk_jre JAVA_OPTS="-Djava.io.tmpdir=$TMPDIR -XX:OnOutOfMemoryError=$PWD/.java-buildpack/open_jdk_jre/bin/killjava.sh -Xmx382293K -Xms382293K -XX:MaxMetaspaceSize=64M -XX:MetaspaceSize=64M -Xss995K -Djava.security.egd=file:///dev/urandom -Daccess.logging.enabled=false -Dhttp.port=$PORT" $PWD/.java-buildpack/tomcat/bin/catalina.sh run`
 
-Showing health and status for app workshop in org TELCO / space gammon as admin...
+Showing health and status for app myfirstpcfdemo in org Northeast / Canada / space kartik as admin...
 OK
 
 requested state: started
@@ -283,8 +267,8 @@ buildpack: java-buildpack=v3.0-offline-https://github.com/cloudfoundry/java-buil
 . And again, view the additional `app.update` event:
 +
 ----
-$ cf events workshop
-Getting events for app workshop in org TELCO / space gammon as admin...
+$ cf events myfirstpcfdemo
+Getting events for app myfirstpcfdemo in org Northeast / Canada / space kartik as admin...
 
 time                          event                 actor      description
 2015-08-11T09:02:17.00-0400   audit.app.update      admin      state: STARTED
