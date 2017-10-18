@@ -7,7 +7,7 @@ This one day hands-on classroom style session will provide developers (and opera
 9:00 AM - 9:15 AM::
  * Session 1: _Introductions, Agenda Review & Pre-requisites Check  
 9:15 AM - 10:00 AM::
- * Demo: Pushing your first app, Apps Manager, Ops Manager_
+ * Demo: Pushing your first app, Apps Manager, Ops Manager
 10:00 PM - 10:30 PM::
  * Session 2: _Pivotal Cloud Foundry Overview_
 10:30 AM - 10:45 AM:: Break 
