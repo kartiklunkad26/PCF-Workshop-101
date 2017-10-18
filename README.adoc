@@ -4,9 +4,9 @@
 
 This one day hands-on classroom style session will provide developers (and operators) with hands on experience with Pivotal Cloud Foundry concepts, architecture and fundamentals of pushing code and building applications. The session includes presentations, demos and hands on labs
 
-9:00 AM - 9:15 AM::
+9:00 AM - 9:15 AM:
  * Session 1: _Introductions, Agenda Review & Pre-requisites Check  
-9:15 AM - 10:00 AM::
+9:15 AM - 10:00 AM:
  * Demo: Pushing your first app, Apps Manager, Ops Manager_
 10:00 PM - 10:30 PM:
  * Session 2: _Pivotal Cloud Foundry Overview_
